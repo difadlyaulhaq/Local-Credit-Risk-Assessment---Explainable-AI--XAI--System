@@ -238,11 +238,11 @@ Berikut adalah status implementasi struktur file dan direktori proyek:
   - [ ] `data/credit_finetune_dataset.jsonl` — Dataset instruksi sintetis untuk fine-tuning Qwen LLM
 - [ ] `notebooks/`
   - [x] `notebooks/01_eda_and_feature_eng.ipynb` — EDA, data cleaning, imputasi missing value & handling outlier
-  - [ ] `notebooks/02_ml_and_shap_modeling.ipynb` — Training XGBoost/LightGBM & kalkulasi kontribusi SHAP
+  - [x] `notebooks/02_ml_and_shap_modeling.ipynb` — Training XGBoost/LightGBM & kalkulasi kontribusi SHAP
   - [ ] `notebooks/03_dataset_generation.ipynb` — Pipeline sintesis prompt instruksi (Fitur + SHAP $\rightarrow$ Credit Memo)
   - [ ] `notebooks/04_unsloth_finetuning.ipynb` — Fine-tuning Qwen 2.5-7B via Unsloth (QLoRA) & export GGUF
 - [ ] `models/`
-  - [ ] `models/credit_xgboost_model.pkl` — Model klasifikasi machine learning terkalibrasi
+  - [x] `models/credit_xgboost_model.pkl` — Model klasifikasi machine learning terkalibrasi
   - [ ] `models/Modelfile` — Konfigurasi serving model GGUF di Ollama
 - [ ] `app/`
   - [ ] `app/app.py` — Dashboard UI Streamlit Credit Underwriting Assistant
