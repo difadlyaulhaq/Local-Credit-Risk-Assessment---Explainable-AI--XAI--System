@@ -11,6 +11,7 @@ Dokumentasi ini menyajikan laporan komprehensif, metodologi langkah demi langkah
 | **01** | [01_eda_and_feature_engineering_report.md](./01_eda_and_feature_engineering_report.md) | `01_eda_and_feature_eng.ipynb` | Profiling Data, Pembersihan Anomali, Imputasi KNN, Capping Outlier, Rekayasa Fitur Finansial, dan Preprocessing. |
 | **02** | [02_predictive_ml_and_shap_xai_report.md](./02_predictive_ml_and_shap_xai_report.md) | `02_ml_and_shap_modeling.ipynb` | Benchmarking 4 Algoritma ML, Penanganan Imbalance, Tuning XGBoost, Evaluasi ROC-AUC & F1, serta Interpretasi SHAP (Global & Local). |
 | **03** | [03_synthetic_dataset_generation_guide.md](./03_synthetic_dataset_generation_guide.md) | `03_dataset_generation.ipynb` | Konsep Sintesis Dataset Instruksi (Alpaca Prompt), Penyatuan Prediksi ML + SHAP, Skema JSON Underwriting Memo, dan Format JSONL untuk QLoRA. |
+| **04** | [04_unsloth_finetuning_guide.md](./04_unsloth_finetuning_guide.md) | `04_peft_trl_finetuning.ipynb` | Blueprint & Panduan Lengkap Fine-Tuning Qwen 2.5-7B (QLoRA) via Hugging Face PEFT + TRL, Evaluasi JSON Schema, Ekspor GGUF Q4_K_M, dan Konfigurasi Modelfile Ollama. |
 
 ---
 
@@ -26,7 +27,7 @@ flowchart TD
     F --> G["SHAP TreeExplainer (Feature Attribution)"]
     G --> H["03. Instruction Synthesis Engine (Alpaca Schema)"]
     H --> I["credit_finetune_dataset.jsonl (1,200 Balanced Records)"]
-    I --> J["Phase 2: Fine-Tuning Qwen 2.5-7B via Unsloth"]
+    I --> J["Phase 2: Fine-Tuning Qwen 2.5-7B via PEFT & TRL"]
 ```
 
 ---
