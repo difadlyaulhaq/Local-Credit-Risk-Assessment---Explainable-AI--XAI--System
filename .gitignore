@@ -1,2 +1,14 @@
+# Data
 /cleaned_dataset.csv
 /credit_risk_dataset.csv
+
+# Large Merged Model (>100MB GitHub limit)
+models/merged_model/
+outputs/
+*.bin
+*.pth
+
+# Python & Jupyter
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
