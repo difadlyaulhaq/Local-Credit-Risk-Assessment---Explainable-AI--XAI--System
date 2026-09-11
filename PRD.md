@@ -262,11 +262,11 @@ Berikut adalah status implementasi struktur file dan direktori proyek saat ini:
   - [x] `data/feature_engineered_dataset.csv` — Dataset dengan 22 fitur lengkap
   - [x] `data/credit_finetune_dataset.jsonl` — 1,200+ dataset instruksi sintetis untuk fine-tuning Qwen
   - [x] `data/sample_test_records.json` — Sampel data uji untuk validasi cepat
-- [ ] `notebooks/`
+- [x] `notebooks/`
   - [x] `notebooks/01_eda_and_feature_eng.ipynb` — EDA, cleaning, outlier handling & feature engineering
   - [x] `notebooks/02_ml_and_shap_modeling.ipynb` — Training XGBoost (ROC-AUC 0.949) & kalkulasi SHAP
   - [x] `notebooks/03_dataset_generation.ipynb` — Pipeline sintesis dataset instruksi (Fitur + SHAP $\rightarrow$ Credit Memo)
-  - [ ] `notebooks/04_peft_trl_finetuning.ipynb` — Pipeline Fine-Tuning Qwen 2.5-7B via Hugging Face PEFT + TRL & Export GGUF
+  - [x] `notebooks/04_peft_trl_finetuning.ipynb` — Pipeline Fine-Tuning Qwen 2.5-7B via Hugging Face PEFT + TRL & Export GGUF
 - [ ] `models/`
   - [x] `models/credit_xgboost_model.pkl` — Model klasifikasi machine learning terkalibrasi
   - [x] `models/model_metadata.json` — Hyperparameter terbaik & metrik evaluasi model
