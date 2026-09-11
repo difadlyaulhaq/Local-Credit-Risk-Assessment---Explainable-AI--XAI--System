@@ -5,205 +5,131 @@ pipeline_tag: text-generation
 tags:
 - base_model:adapter:Qwen/Qwen2.5-3B-Instruct
 - lora
+- qlora
 - sft
 - transformers
 - trl
+- credit-risk
+- explainable-ai
+- shap
 ---
 
-# Model Card for Model ID
-
-<!-- Provide a quick summary of what the model is/does. -->
-
-
-
-## Model Details
-
-### Model Description
-
-<!-- Provide a longer summary of what this model is. -->
-
-
-
-- **Developed by:** [More Information Needed]
-- **Funded by [optional]:** [More Information Needed]
-- **Shared by [optional]:** [More Information Needed]
-- **Model type:** [More Information Needed]
-- **Language(s) (NLP):** [More Information Needed]
-- **License:** [More Information Needed]
-- **Finetuned from model [optional]:** [More Information Needed]
-
-### Model Sources [optional]
-
-<!-- Provide the basic links for the model. -->
-
-- **Repository:** [More Information Needed]
-- **Paper [optional]:** [More Information Needed]
-- **Demo [optional]:** [More Information Needed]
-
-## Uses
-
-<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
-
-### Direct Use
-
-<!-- This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. -->
-
-[More Information Needed]
-
-### Downstream Use [optional]
-
-<!-- This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app -->
-
-[More Information Needed]
-
-### Out-of-Scope Use
-
-<!-- This section addresses misuse, malicious use, and uses that the model will not work well for. -->
-
-[More Information Needed]
-
-## Bias, Risks, and Limitations
-
-<!-- This section is meant to convey both technical and sociotechnical limitations. -->
-
-[More Information Needed]
-
-### Recommendations
-
-<!-- This section is meant to convey recommendations with respect to the bias, risk, and technical limitations. -->
-
-Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations.
-
-## How to Get Started with the Model
-
-Use the code below to get started with the model.
-
-[More Information Needed]
-
-## Training Details
-
-### Training Data
-
-<!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
-
-[More Information Needed]
-
-### Training Procedure
-
-<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
-
-#### Preprocessing [optional]
-
-[More Information Needed]
-
-
-#### Training Hyperparameters
-
-- **Training regime:** [More Information Needed] <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
-
-#### Speeds, Sizes, Times [optional]
-
-<!-- This section provides information about throughput, start/end time, checkpoint size if relevant, etc. -->
-
-[More Information Needed]
-
-## Evaluation
-
-<!-- This section describes the evaluation protocols and provides the results. -->
-
-### Testing Data, Factors & Metrics
-
-#### Testing Data
-
-<!-- This should link to a Dataset Card if possible. -->
-
-[More Information Needed]
-
-#### Factors
-
-<!-- These are the things the evaluation is disaggregating by, e.g., subpopulations or domains. -->
-
-[More Information Needed]
-
-#### Metrics
-
-<!-- These are the evaluation metrics being used, ideally with a description of why. -->
-
-[More Information Needed]
-
-### Results
-
-[More Information Needed]
-
-#### Summary
-
-
-
-## Model Examination [optional]
-
-<!-- Relevant interpretability work for the model goes here -->
-
-[More Information Needed]
-
-## Environmental Impact
-
-<!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
-
-Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
-
-- **Hardware Type:** [More Information Needed]
-- **Hours used:** [More Information Needed]
-- **Cloud Provider:** [More Information Needed]
-- **Compute Region:** [More Information Needed]
-- **Carbon Emitted:** [More Information Needed]
-
-## Technical Specifications [optional]
-
-### Model Architecture and Objective
-
-[More Information Needed]
-
-### Compute Infrastructure
-
-[More Information Needed]
-
-#### Hardware
-
-[More Information Needed]
-
-#### Software
-
-[More Information Needed]
-
-## Citation [optional]
-
-<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
-
-**BibTeX:**
-
-[More Information Needed]
-
-**APA:**
-
-[More Information Needed]
-
-## Glossary [optional]
-
-<!-- If relevant, include terms and calculations in this section that can help readers understand the model or model card. -->
-
-[More Information Needed]
-
-## More Information [optional]
-
-[More Information Needed]
-
-## Model Card Authors [optional]
-
-[More Information Needed]
-
-## Model Card Contact
-
-[More Information Needed]
-### Framework versions
-
-- PEFT 0.17.1
+# Qwen 2.5 (3B) - Credit Risk Underwriting & XAI LoRA Adapter
+
+LoRA Adapter ini adalah hasil *Supervised Fine-Tuning (SFT)* pada model **Qwen/Qwen2.5-3B-Instruct** menggunakan teknik **QLoRA (4-bit NF4)**. Model dilatih khusus untuk mengevaluasi data profil pemohon pinjaman, kalkulasi probabilitas gagal bayar (*Probability of Default* dari XGBoost), dan kontribusi faktor risiko matematis (*SHAP Values*), kemudian menghasilkan **Memo Analisis Kredit (*Credit Underwriting Memo*)** terstruktur dalam format JSON valid.
+
+* **Developed by:** Difa Dlyaulhaq
+* **Repository:** [https://github.com/difadlyaulhaq/xai-credit-agent](https://github.com/difadlyaulhaq/xai-credit-agent)
+* **Base Model:** `Qwen/Qwen2.5-3B-Instruct`
+* **Task:** Credit Risk Assessment & Automated Underwriting Memo Generation
+* **Language:** Bahasa Indonesia (Formal Banking & Risk Underwriting Terminology)
+
+---
+
+## 🎯 Model Capabilities
+
+Model mampu menghasilkan output JSON dengan skema terstruktur:
+* `recommendation`: `APPROVE`, `REJECT`, atau `MANUAL_REVIEW`
+* `risk_level`: `LOW_RISK`, `MEDIUM_RISK`, atau `HIGH_RISK`
+* `probability_of_default`: Persentase risiko default
+* `key_risk_drivers`: Faktor-faktor pendorong risiko terbesar berbasis kontribusi positif (+SHAP)
+* `mitigating_factors`: Faktor-faktor pereda risiko berbasis kontribusi negatif (-SHAP)
+* `executive_summary`: Narasi profesional pertimbangan kredit bagi *Credit Risk Committee*
+
+---
+
+## ⚙️ Hyperparameter Training
+
+* **PEFT Method:** LoRA (Low-Rank Adaptation)
+* **Rank (r):** 8
+* **LoRA Alpha:** 16
+* **LoRA Dropout:** 0.05
+* **Target Modules:** `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`
+* **Quantization:** 4-bit NormalFloat (NF4) via BitsAndBytes
+* **Optimizer:** Paged AdamW 8-bit
+* **Learning Rate:** 2e-4 (Cosine scheduler)
+* **Final Training Loss:** 0.1276
+
+---
+
+## 🚀 Cara Penggunaan (Inference Example)
+
+```python
+import torch
+import json
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import PeftModel
+
+base_model_id = "Qwen/Qwen2.5-3B-Instruct"
+adapter_dir = "models/lora_adapter"
+
+# 1. Load Tokenizer
+tokenizer = AutoTokenizer.from_pretrained(adapter_dir, trust_remote_code=True)
+
+# 2. Load Base Model dengan 4-bit Quantization
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.float16,
+)
+
+base_model = AutoModelForCausalLM.from_pretrained(
+    base_model_id,
+    quantization_config=bnb_config,
+    device_map="auto",
+    trust_remote_code=True,
+)
+
+# 3. Attach LoRA Adapter
+model = PeftModel.from_pretrained(base_model, adapter_dir)
+model.eval()
+
+# 4. Inferensi ChatML Prompt
+prompt_template = """<|im_start|>system
+Anda adalah Senior Credit Risk Underwriter AI di institusi perbankan. Tugas Anda adalah mengevaluasi aplikasi kredit pemohon berdasarkan data demografi, keuangan, hasil prediksi model XGBoost (Probability of Default), dan kontribusi faktor risiko matematis (SHAP Values).
+
+Hasilkan laporan analisis kredit (Credit Underwriting Memo) yang terstruktur strictly dalam format JSON valid.<|im_end|>
+<|im_start|>user
+### PROFIL PEMOHON PINJAMAN:
+- Usia Pemohon: 24 tahun
+- Pendapatan Tahunan: $45,000
+- Status Kepemilikan Rumah: RENT
+- Lama Bekerja: 2.0 tahun
+- Tujuan Pinjaman: MEDICAL
+- Peringkat Risiko Kredit (Grade): C
+- Besaran Pinjaman yang Diajukan: $12,000
+- Suku Bunga Pinjaman: 13.50%
+- Rasio Pinjaman / Pendapatan: 26.7%
+- Riwayat Gagal Bayar Sebelumnya: N
+- Panjang Riwayat Kredit: 3 tahun
+
+### KALKULASI RISIKO ML & ANALISIS SHAP:
+- Prediksi Probability of Default (PD): 31.2%
+- Kategori Risiko Awal: MEDIUM_RISK
+- Rekomendasi Awal: MANUAL_REVIEW
+- Faktor Pendorong Risiko Terbesar (+SHAP):
+  * person_home_ownership_RENT bernilai 1.0 (SHAP: +0.28)
+  * Rasio pinjaman terhadap pendapatan sebesar 26.7% (SHAP: +0.22)
+- Faktor Pereda Risiko Terbesar (-SHAP):
+  * Riwayat gagal bayar bersih (cb_person_default_on_file = N) (SHAP: -0.65)
+  * Pendapatan tahunan sebesar $45,000 (SHAP: -0.35)<|im_end|>
+<|im_start|>assistant
+"""
+
+inputs = tokenizer([prompt_template], return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
+
+with torch.no_grad():
+    outputs = model.generate(
+        **inputs,
+        max_new_tokens=512,
+        temperature=0.2,
+        top_p=0.9,
+        do_sample=True,
+        pad_token_id=tokenizer.pad_token_id,
+        eos_token_id=tokenizer.eos_token_id,
+    )
+
+response = tokenizer.batch_decode(outputs, skip_special_tokens=False)[0]
+json_str = response.split("<|im_start|>assistant\n")[-1].replace("<|im_end|>", "").strip()
+print(json_str)
+```

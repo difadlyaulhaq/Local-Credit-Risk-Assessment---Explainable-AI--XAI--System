@@ -1,22 +1,23 @@
-# 🏦 Local Credit Risk Assessment & Explainable AI (XAI) System
-### *Automated Credit Memo Generation with Fine-Tuned Local LLMs (Qwen 2.5) & SHAP*
+# 🏦 XAI Credit Agent: Explainable AI & Agentic Credit Risk Underwriting System
+### *Automated Credit Memo Generation with Fine-Tuned Qwen 2.5 (QLoRA), XGBoost & SHAP*
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Fine-Tuning](https://img.shields.io/badge/Fine--Tuning-Unsloth%20%2B%20QLoRA-green.svg)](https://github.com/unslothai/unsloth)
-[![Model](https://img.shields.io/badge/LLM-Qwen2.5--7B--Instruct-orange.svg)](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
-[![Serving](https://img.shields.io/badge/Serving-Ollama%20(GGUF%20Q4__K__M)-blueviolet.svg)](https://ollama.ai/)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-difadlyaulhaq%2Fxai--credit--agent-blue.svg?logo=github)](https://github.com/difadlyaulhaq/xai-credit-agent)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![Model](https://img.shields.io/badge/LLM-Qwen2.5--3B--Instruct-orange.svg)](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct)
+[![Fine-Tuning](https://img.shields.io/badge/Fine--Tuning-PEFT%20%2B%20TRL%20(QLoRA)-green.svg)](https://github.com/huggingface/peft)
+[![Serving](https://img.shields.io/badge/Serving-Ollama%20%2F%20vLLM%20(GGUF%20%2F%20Safetensors)-blueviolet.svg)](https://ollama.ai/)
 [![Dashboard](https://img.shields.io/badge/UI-Streamlit-red.svg?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
 ---
 
 ## 📌 Ringkasan Proyek (Project Overview)
 
-Proyek ini adalah sistem **manajemen dan asesmen risiko kredit (*Credit Risk Management*) *end-to-end*** yang menggabungkan:
-1. **Machine Learning Klasik (XGBoost / LightGBM)** untuk kalkulasi probabilitas gagal bayar (*Probability of Default / PD*).
-2. **Explainable AI (SHAP)** untuk menganalisis kontribusi setiap fitur finansial pemohon terhadap skor risiko secara transparan dan matematis.
-3. **Fine-Tuned Small Language Model (Qwen 2.5-7B-Instruct)** yang dilatih khusus untuk menerjemahkan data tabular & nilai SHAP menjadi **Memo Analisis Kredit (*Credit Underwriting Memo*)** terstruktur (rekomendasi, poin mitigasi, analisis risiko, dan format JSON).
-4. **Local & Privacy-Preserving Inference (Ollama / GGUF)** sehingga seluruh data sensitif nasabah (PII) tetap berada di mesin lokal tanpa mengirim API request ke cloud publik.
-5. **Interactive Dashboard (Streamlit)** sebagai antarmuka terintegrasi bagi analis kredit (*credit officer* / *underwriter*).
+**XAI Credit Agent** adalah sistem manajemen dan asesmen risiko kredit (*Credit Risk Management*) *end-to-end* yang menggabungkan:
+1. **Machine Learning Klasik (XGBoost / LightGBM)** untuk kalkulasi probabilitas gagal bayar (*Probability of Default / PD*) dengan performa tinggi (**ROC-AUC: 0.9509**, **F1-Score: 0.8157**).
+2. **Explainable AI (SHAP TreeExplainer)** untuk mengekstrak kontribusi matematis tiap fitur finansial pemohon (*Feature Attribution* / *Risk Drivers*) secara transparan.
+3. **Fine-Tuned Generative LLM (Qwen 2.5-3B-Instruct)** yang dilatih khusus menggunakan **QLoRA (4-bit NF4)** untuk mengonversi data pemohon + metrik SHAP menjadi **Memo Analisis Kredit (*Credit Underwriting Memo*)** berformat JSON terstruktur dan audit-ready.
+4. **Local & Privacy-Preserving Inference (Ollama / Local PyTorch)** sehingga data sensitif nasabah (PII) tetap aman di infrastruktur lokal tanpa dikirim ke cloud pihak ketiga.
+5. **Interactive Dashboard (Streamlit)** sebagai antarmuka terintegrasi bagi *credit risk officer* dan *underwriter*.
 
 ---
 
@@ -25,7 +26,7 @@ Proyek ini adalah sistem **manajemen dan asesmen risiko kredit (*Credit Risk Man
 ```
 +-----------------------------------------------------------------------------------+
 |                            1. DATA & PREDICTIVE ML LAYER                          |
-|  [Applicant Data] ---> [Preprocessing & Feature Eng] ---> [XGBoost/LightGBM Model]|
+|  [Applicant Data] ---> [Preprocessing & Feature Eng] ---> [XGBoost Model (0.95 AUC]|
 |  (Age, Income, Loan,                                       |                      |
 |   Home, History, etc.)                                     v                      |
 |                                                  [Probability of Default (PD)]    |
@@ -34,25 +35,25 @@ Proyek ini adalah sistem **manajemen dan asesmen risiko kredit (*Credit Risk Man
                                        v
 +-----------------------------------------------------------------------------------+
 |                        2. EXPLAINABLE AI (XAI) LAYER                              |
-|  [SHAP TreeExplainer] ---> Menghitung kontribusi tiap fitur (Feature Importance)  |
+|  [SHAP TreeExplainer] ---> Menghitung kontribusi tiap fitur (Feature Attribution) |
 |                            Contoh: +loan_percent_income (+0.42), -income (-0.18)  |
 +-----------------------------------------------------------------------------------+
                                        |
                                        v
 +-----------------------------------------------------------------------------------+
 |                     3. FINE-TUNED GENERATIVE AI (LLM) LAYER                       |
-|  [Instruction Prompt]                                                             |
+|  [ChatML Prompt]                                                                  |
 |  "Applicant features + SHAP values -> Generate Credit Risk Memo & Recommendation" |
 |                                      |                                            |
 |                                      v                                            |
-|          [Qwen 2.5-7B-Instruct (Fine-Tuned via Unsloth QLoRA, GGUF Q4_K_M)]       |
-|                            Served locally via Ollama API                          |
+|          [Qwen 2.5-3B-Instruct (Fine-Tuned via QLoRA 4-bit NF4)]                 |
+|                   LoRA Adapter: models/lora_adapter (57.1 MB)                     |
 +-----------------------------------------------------------------------------------+
                                        |
                                        v
 +-----------------------------------------------------------------------------------+
 |                             4. USER INTERFACE LAYER                               |
-|  [Streamlit Web App]                                                              |
+|  [Streamlit Web Application]                                                      |
 |   - Form Input Profil Nasabah                                                     |
 |   - Gauge Risiko Default & Waterfall Chart SHAP                                  |
 |   - Narasi Keputusan Kredit & Rekomendasi Syarat Pinjaman (JSON / Markdown)       |
@@ -61,152 +62,151 @@ Proyek ini adalah sistem **manajemen dan asesmen risiko kredit (*Credit Risk Man
 
 ---
 
-## 🎯 Evaluasi & Alasan Pemilihan Model (Model Selection Benchmark)
+## 🎯 Model Benchmark & Decision Matrix
 
-Untuk skenario **Local Credit Risk Management & Fine-Tuning**, model LLM dipilih berdasarkan 3 kriteria utama:
-* **Penalaran Statistik & Matematika (*Mathematical Reasoning*):** Kemampuan menginterpretasi metrik finansial (Debt-to-Income, SHAP values, suku bunga, rasio pendapatan).
-* **Efisiensi Ukuran (*Size & VRAM Efficiency*):** Mampu dijalankan secara *offline* di laptop/komputer lokal (RAM 16 GB atau VRAM GPU 6–8 GB).
-* **Kepatuhan Instruksi & Output Terformat (*Instruction Following & JSON adherence*):** Menghasilkan laporan analitik yang rapi tanpa halusinasi numerik.
-
-### Matriks Perbandingan Model
-
-| Model LLM | Kategori Ukuran | Skor Math / Reasoning | Kemudahan Local Inference | Rekomendasi Penggunaan |
+| Model LLM | Ukuran | Kemampuan Analisis Finansial | Hardware Requirement | Status di Proyek |
 | :--- | :---: | :---: | :---: | :--- |
-| **Qwen 2.5 (7B-Instruct)** ⭐ *(Pilihan Utama)* | **7B** | **Sangat Tinggi (Top Tier)** | **Lancar di GPU 6-8GB / RAM 16GB (Q4)** | **Paling ideal** untuk tugas reasoning numerik, analisis tabel, dan output JSON terstruktur. |
-| **Qwen 2.5 (3B-Instruct)** | 3B | Tinggi | Sangat Ringan (RAM 8GB / VRAM 4GB) | Alternatif ultra-ringan jika hardware lokal sangat terbatas. |
-| **Llama 3.1 (8B-Instruct)** | 8B | Tinggi | Standar (VRAM 6-8GB) | Sangat bagus untuk narasi bahasa Inggris alami dan integrasi ekosistem luas. |
-| **Llama 3.2 (3B-Instruct)** | 3B | Menengah | Sangat Ringan | Cocok untuk prototipe cepat teks umum. |
-| **FinMA / FinLlama / Domain Models** | 7B-13B | Variatif | Menengah | Kurang direkomendasikan untuk portofolio karena lebih bernilai menunjukkan kemampuan *fine-tuning* sendiri dari *base model*. |
+| **Qwen 2.5 (3B-Instruct)** ⭐ | **3B** | **Sangat Tinggi (Top Tier)** | **Lancar di GPU 4GB VRAM / RAM 8GB** | **Model Utama (Trained & Deployed)** |
+| **Qwen 2.5 (7B-Instruct)** | 7B | Sangat Tinggi | GPU 8GB–16GB VRAM / Colab T4 | Opsi Skala Besar |
+| **Llama 3.1 (8B-Instruct)** | 8B | Tinggi | GPU 8GB–16GB VRAM | Alternatif Bahasa Inggris |
+| **XGBoost (Tabular Classifier)**| - | **ROC-AUC: 0.9509** | CPU / GPU Ringan | **Model Predictive Default Utama** |
 
-> **Keputusan Akhir:** Menggunakan **Qwen 2.5 (7B-Instruct)**. Model ini di-fine-tune menggunakan **Unsloth (QLoRA)** di Google Colab (Free T4 GPU), diekspor ke format **GGUF (Q4_K_M)**, dan di-serve di local machine via **Ollama**.
+> **Implementasi Fine-Tuning**: Model dilatih menggunakan teknik **QLoRA (4-bit NF4)** pada dataset `data/credit_finetune_dataset.jsonl` (1.200 sampel berpasangan). Bobot adapter tersimpan di [`models/lora_adapter/`](./models/lora_adapter/).
 
 ---
 
-## 🛠️ Tech Stack & Hardware Setup
+## 🛠️ Tech Stack
 
-| Komponen | Teknologi / Tools | Keterangan |
+| Komponen | Teknologi | Keterangan |
 | :--- | :--- | :--- |
-| **Data & Feature Eng** | `pandas`, `numpy`, `scikit-learn` | Pembersihan data, deteksi outlier, imputasi, dan rasio keuangan. |
-| **Predictive ML & XAI** | `xgboost` / `lightgbm`, `shap` | Model klasifikasi default dan *TreeExplainer* untuk interpretabilitas. |
-| **LLM Base Model** | `Qwen/Qwen2.5-7B-Instruct` | Model open-source berbobot 7B dengan *reasoning* analitik terbaik. |
-| **Fine-Tuning Engine** | `Unsloth` + `QLoRA` (PEFT) | 2x lebih cepat, hemat VRAM 80%, dijalankan di Google Colab GPU T4 (Gratis). |
-| **Quantization & Serving**| `GGUF (Q4_K_M)` + `Ollama` | Menjalankan model quantized 4-bit secara lokal dengan latensi rendah. |
-| **Application UI** | `Streamlit`, `Plotly` | Dashboard interaktif visualisasi risiko, chart SHAP, dan generator memo. |
+| **Data & Feature Engineering** | `pandas`, `numpy`, `scikit-learn` | Imputasi KNN, outlier capping (P99), rekayasa rasio finansial. |
+| **Predictive ML & XAI** | `xgboost`, `shap` | Model klasifikasi default & *TreeExplainer* interpretabilitas. |
+| **LLM Foundation Model** | `Qwen/Qwen2.5-3B-Instruct` | Large Language Model dengan reasoning analitik kuat. |
+| **Fine-Tuning Stack** | `transformers`, `peft`, `trl`, `bitsandbytes` | QLoRA 4-bit NormalFloat, SFTConfig, dan Paged AdamW 8-bit. |
+| **Serving & Inference** | `PyTorch`, `Ollama` / `GGUF` | Inferensi lokal aman dan cepat. |
+| **Application UI** | `Streamlit`, `Plotly`, `Seaborn` | Dashboard interaktif visualisasi risiko & underwriter memo. |
 
 ---
 
 ## 📁 Struktur Direktori Repository
 
 ```
-credit-risk/
+xai-credit-agent/
 │
-├── PRD.md                           # Product Requirements Document & Implementation Checklist
-├── README.md                        # Dokumentasi utama proyek & panduan arsitektur
+├── PRD.md                           # Product Requirements Document & Tech Specs
+├── README.md                        # Dokumentasi utama proyek
+├── requirements.txt                 # Daftar dependensi Python resmi
 │
 ├── data/
 │   ├── credit_risk_dataset.csv      # Dataset mentah profil pemohon pinjaman
 │   ├── cleaned_dataset.csv          # Dataset hasil pembersihan, imputasi KNN & outlier handling
-│   └── credit_finetune_dataset.jsonl# Dataset instruksi untuk fine-tuning LLM (Phase 2)
+│   ├── preprocessed_credit_risk.csv # Dataset hasil feature engineering
+│   ├── credit_finetune_dataset.jsonl# Dataset instruksi fine-tuning LLM (1.200 sampel)
+│   └── sample_test_records.json     # Contoh data uji profil pemohon
 │
 ├── notebooks/
 │   ├── 01_eda_and_feature_eng.ipynb # Pembersihan data, imputasi, outlier handling & EDA
 │   ├── 02_ml_and_shap_modeling.ipynb# Training XGBoost + pembuatan SHAP explanations
-│   ├── 03_dataset_generation.ipynb  # Pembuatan synthetic instruction dataset (Alpaca/ShareGPT format)
-│   └── 04_unsloth_finetuning.ipynb  # Pipeline Fine-Tuning QLoRA di Google Colab & Export GGUF
+│   ├── 03_dataset_generation.ipynb  # Pembuatan synthetic instruction dataset (ChatML schema)
+│   └── 04_peft_trl_finetuning.ipynb # Pipeline Fine-Tuning QLoRA (4-bit NF4) & validasi JSON
 │
 ├── models/
-│   ├── credit_xgboost_model.pkl     # Model ML tabular biner
-│   └── Modelfile                    # Konfigurasi Ollama untuk model GGUF
+│   ├── credit_xgboost_model.pkl     # Bobot model Machine Learning XGBoost
+│   ├── model_metadata.json          # Metadata fitur & threshold klasifikasi
+│   └── lora_adapter/                # Bobot LoRA Adapter fine-tuned Qwen 2.5 (57.1 MB)
+│       ├── adapter_model.safetensors# Bobot adapter LoRA
+│       ├── adapter_config.json      # Konfigurasi rank & target modules
+│       └── tokenizer*               # Tokenizer & chat template Jinja
 │
-├── app/
-│   ├── app.py                       # Main script Streamlit Web Application
-│   ├── utils_ml.py                  # Helper inferensi XGBoost & SHAP
-│   └── utils_llm.py                 # Client komunikasi Ollama API
+├── doc/
+│   ├── README.md                    # Indeks dokumentasi teknis
+│   ├── 01_eda_and_feature_engineering_report.md
+│   ├── 02_predictive_ml_and_shap_xai_report.md
+│   ├── 03_synthetic_dataset_generation_guide.md
+│   └── 04_unsloth_finetuning_guide.md
 │
-└── requirements.txt                 # Dependensi pustaka Python
+└── app/
+    ├── app.py                       # Main script Streamlit Web Application
+    ├── utils_ml.py                  # Helper inferensi XGBoost & kalkulasi SHAP
+    └── utils_llm.py                 # Helper pemanggilan model LLM / Ollama
 ```
 
 ---
 
-## 🚀 Alur Eksekusi Proyek (Step-by-Step Pipeline)
+## 🚀 Panduan Menjalankan Sistem (Getting Started)
 
-### Langkah 1: Exploratory Data Analysis & Feature Engineering
-- Menangani nilai hilang (`person_emp_length`, `loan_int_rate`).
-- Mengeliminasi outlier data tidak realistis (`person_age > 100`, `person_emp_length > 60`).
-- Membuat fitur baru: rasio cicilan, *debt-to-income tier*, dan interaksi histori kredit.
+### 1. Kloning Repositori & Persiapan Lingkungan
 
-### Langkah 2: Model Klasifikasi & SHAP Interpretation
-- Melatih model **XGBoost Classifier** untuk memprediksi `loan_status` (0: Non-default, 1: Default).
-- Menggunakan `shap.TreeExplainer` untuk mengekstrak kontribusi marginal (*SHAP values*) setiap fitur untuk setiap individu pemohon pinjaman.
-
-### Langkah 3: Sintesis Dataset Fine-Tuning (Instruction Tuning)
-- Mengonversi data tabular + probabilitas default + kontribusi top fitur SHAP menjadi pasangan **Instruction - Input - Output (Credit Risk Memo)**.
-- Format Output:
-  ```json
-  {
-    "recommendation": "REJECT / APPROVE / MANUAL_REVIEW",
-    "risk_level": "HIGH / MEDIUM / LOW",
-    "probability_of_default": "38.5%",
-    "key_risk_drivers": [
-      "Tingginya rasio pinjaman terhadap pendapatan (loan_percent_income = 0.45)",
-      "Adanya catatan riwayat gagal bayar sebelumnya (cb_person_default_on_file = Y)"
-    ],
-    "mitigating_factors": [
-      "Status kepemilikan rumah MORTGAGE menunjukkan stabilitas tempat tinggal"
-    ],
-    "underwriter_memo": "Pengajuan pinjaman berisiko tinggi karena rasio beban utang melampaui batas toleransi risiko internal (>35%)..."
-  }
-  ```
-
-### Langkah 4: Fine-Tuning dengan Unsloth & QLoRA di Google Colab
-- Memuat model `Qwen/Qwen2.5-7B-Instruct` dengan kuantisasi 4-bit (`bitsandbytes`).
-- Mengaplikasikan LoRA adapter pada modul `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`.
-- Melatih model selama 2–3 epoch menggunakan `SFTTrainer`.
-- Menyimpan hasil adapter dan mengekspor model ter-merge ke format **GGUF `q4_k_m`**.
-
-### Langkah 5: Local Serving via Ollama
-1. Pindahkan file model `.gguf` ke laptop/komputer lokal.
-2. Buat file `Modelfile`:
-   ```dockerfile
-   FROM ./qwen2.5-credit-risk-q4_k_m.gguf
-   TEMPLATE """{{ if .System }}<|im_start|>system
-   {{ .System }}<|im_end|>
-   {{ end }}{{ if .Prompt }}<|im_start|>user
-   {{ .Prompt }}<|im_end|>
-   <|im_start|>assistant
-   {{ end }}"""
-   PARAMETER temperature 0.2
-   PARAMETER top_p 0.9
-   PARAMETER stop "<|im_end|>"
-   ```
-3. Registrasikan ke Ollama:
-   ```bash
-   ollama create credit-risk-qwen -f Modelfile
-   ollama run credit-risk-qwen
-   ```
-
-### Langkah 6: Menjalankan Streamlit Dashboard
 ```bash
-# Clone & Navigasi ke direktori
-cd D:/project/credit-risk
+git clone https://github.com/difadlyaulhaq/xai-credit-agent.git
+cd xai-credit-agent
 
-# Install dependensi
+# Buat dan aktifkan virtual environment (opsional tapi disarankan)
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# Install seluruh dependensi
 pip install -r requirements.txt
+```
 
-# Jalankan dashboard
+### 2. Menjalankan Eksperimen di Notebooks
+Notebook dapat dijalankan berurutan:
+1. `notebooks/01_eda_and_feature_eng.ipynb` -> Pembersihan dan feature engineering data tabular.
+2. `notebooks/02_ml_and_shap_modeling.ipynb` -> Pelatihan model XGBoost dan ekstraksi nilai SHAP.
+3. `notebooks/03_dataset_generation.ipynb` -> Pembuatan dataset JSONL instruksi underwriting.
+4. `notebooks/04_peft_trl_finetuning.ipynb` -> Fine-tuning model LLM Qwen 2.5 dengan QLoRA 4-bit.
+
+### 3. Menguji Inferensi Model Fine-Tuned (Python Script)
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+
+base_model_id = "Qwen/Qwen2.5-3B-Instruct"
+adapter_dir = "models/lora_adapter"
+
+tokenizer = AutoTokenizer.from_pretrained(adapter_dir)
+base_model = AutoModelForCausalLM.from_pretrained(
+    base_model_id,
+    torch_dtype=torch.float16,
+    device_map="auto",
+    load_in_4bit=True
+)
+model = PeftModel.from_pretrained(base_model, adapter_dir)
+
+print("Model XAI Credit Agent siap digunakan untuk inferensi!")
+```
+
+### 4. Menjalankan Dashboard Streamlit
+
+```bash
 streamlit run app/app.py
 ```
 
 ---
 
-## 📊 Keunggulan Nilai Portofolio (Portfolio Value Proposition)
+## 📄 Contoh Output Format JSON Underwriting Memo
 
-1. **Domain-Specific Fine-Tuning:** Menunjukkan kompetensi praktis dalam membawa *foundation model* umum menjadi spesifik untuk industri *Fintech / Banking Risk*.
-2. **Explainable AI (XAI) Integration:** Tidak mengandalkan LLM sebagai *black box*, melainkan menggabungkan nilai SHAP matematis sebagai dasar penalaran (*grounded reasoning*), meminimalisir risiko halusinasi.
-3. **Data Privacy & Offline Deployment:** Arsitektur mematuhi standar kerahasiaan data perbankan (tidak mengirim data nasabah ke API pihak ketiga eksternal).
-4. **End-to-End Delivery:** Mulai dari eksplorasi data mentah tabular, pemodelan prediktif, *instruction tuning*, kuantisasi GGUF, hingga antarmuka pengguna interaktif.
+```json
+{
+  "recommendation": "MANUAL_REVIEW",
+  "risk_level": "MEDIUM_RISK",
+  "probability_of_default": "31.2%",
+  "key_risk_drivers": [
+    "Status kepemilikan rumah RENT memberikan kontribusi peningkatan risiko (SHAP: +0.28)",
+    "Rasio pinjaman terhadap pendapatan sebesar 26.7% mendekati ambang batas konservatif (SHAP: +0.22)"
+  ],
+  "mitigating_factors": [
+    "Riwayat kredit bersih tanpa catatan gagal bayar sebelumnya (SHAP: -0.65)",
+    "Tingkat pendapatan tahunan stabil di angka $45,000 (SHAP: -0.35)"
+  ],
+  "executive_summary": "Aplikasi kredit dikategorikan sebagai risiko moderat. Profil finansial pemohon menunjukkan stabilitas pendapatan dan riwayat kredit yang sangat baik, namun status tempat tinggal sewa dan rasio pinjaman yang cukup tinggi memerlukan verifikasi tambahan atas arus kas bulanan."
+}
+```
 
 ---
 
-## 📄 Lisensi & Kontribusi
-Proyek ini dibuat untuk keperluan riset, portofolio data science, dan edukasi manajemen risiko kredit. Terbuka untuk eksplorasi dan kontribusi lebih lanjut.
+## 👤 Author
+* **Difa Dlyaulhaq** — [GitHub Profile](https://github.com/difadlyaulhaq) | [Repository](https://github.com/difadlyaulhaq/xai-credit-agent)
