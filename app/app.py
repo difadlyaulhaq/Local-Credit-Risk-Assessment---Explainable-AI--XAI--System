@@ -65,8 +65,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Header Section
-st.markdown("<div class="main-header">🏦 XAI Credit Agent: Explainable AI & Credit Underwriting</div>", unsafe_allow_html=True)
-st.markdown("<div class="sub-header">Sistem Penilaian Risiko Kredit & Pembuatan Memo Keputusan Otomatis berbasis <b>XGBoost (AUC: 0.95)</b>, <b>SHAP Interpretability</b>, dan <b>Fine-Tuned LLM (Qwen 2.5)</b></div>", unsafe_allow_html=True)
+st.markdown('<div class="main-header">🏦 XAI Credit Agent: Explainable AI & Credit Underwriting</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Sistem Penilaian Risiko Kredit & Pembuatan Memo Keputusan Otomatis berbasis <b>XGBoost (AUC: 0.95)</b>, <b>SHAP Interpretability</b>, dan <b>Fine-Tuned LLM (Qwen 2.5)</b></div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # SIDEBAR: APPLICANT INPUT FORM & PRESETS
@@ -179,36 +179,36 @@ recommendation = ml_result['recommendation']
 col_m1, col_m2, col_m3, col_m4 = st.columns([1.2, 1, 1, 1.3])
 
 with col_m1:
-    st.markdown("<div class="card">", unsafe_allow_html=True)
-    st.markdown("<div class="metric-title">Rekomendasi Keputusan</div>", unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="metric-title">Rekomendasi Keputusan</div>', unsafe_allow_html=True)
     if recommendation == "APPROVE":
-        st.markdown("<div class="metric-value" style="color: #059669;">✅ APPROVE</div>", unsafe_allow_html=True)
-        st.markdown("<span class="badge badge-approve">Risiko Terkendali</span>", unsafe_allow_html=True)
+        st.markdown('<div class="metric-value" style="color: #059669;">✅ APPROVE</div>', unsafe_allow_html=True)
+        st.markdown('<span class="badge badge-approve">Risiko Terkendali</span>', unsafe_allow_html=True)
     elif recommendation == "MANUAL_REVIEW":
-        st.markdown("<div class="metric-value" style="color: #d97706;">⚠️ REVIEW</div>", unsafe_allow_html=True)
-        st.markdown("<span class="badge badge-review">Verifikasi Tambahan</span>", unsafe_allow_html=True)
+        st.markdown('<div class="metric-value" style="color: #d97706;">⚠️ REVIEW</div>', unsafe_allow_html=True)
+        st.markdown('<span class="badge badge-review">Verifikasi Tambahan</span>', unsafe_allow_html=True)
     else:
-        st.markdown("<div class="metric-value" style="color: #dc2626;">❌ REJECT</div>", unsafe_allow_html=True)
-        st.markdown("<span class="badge badge-reject">Risiko Tinggi</span>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('<div class="metric-value" style="color: #dc2626;">❌ REJECT</div>', unsafe_allow_html=True)
+        st.markdown('<span class="badge badge-reject">Risiko Tinggi</span>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col_m2:
-    st.markdown("<div class="card">", unsafe_allow_html=True)
-    st.markdown("<div class="metric-title">Probabilitas Default (PD)</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class="metric-value">{pd_val * 100:.1f}%</div>", unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="metric-title">Probabilitas Default (PD)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">{pd_val * 100:.1f}%</div>', unsafe_allow_html=True)
     st.caption("Prediksi XGBoost Model (AUC: 0.95)")
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col_m3:
     loan_pct_income = (loan_amnt / income) * 100.0
-    st.markdown("<div class="card">", unsafe_allow_html=True)
-    st.markdown("<div class="metric-title">Rasio Pinjaman/Gaji</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class="metric-value">{loan_pct_income:.1f}%</div>", unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="metric-title">Rasio Pinjaman/Gaji</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">{loan_pct_income:.1f}%</div>', unsafe_allow_html=True)
     if loan_pct_income > 35:
         st.caption("⚠️ Melebihi ambang batas 35%")
     else:
         st.caption("✅ Dalam batas aman")
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col_m4:
     # Gauge Chart for Probability of Default
@@ -278,33 +278,33 @@ with col_right:
     st.markdown(f"**Engine Sumber:** `{memo_json.get('source', 'XAI LLM Engine')}`")
 
     # Executive Summary Card
-    st.markdown("<div class="card">", unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("##### 📌 Executive Summary")
     st.write(memo_json.get('executive_summary', '-'))
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     col_d1, col_d2 = st.columns(2)
     with col_d1:
-        st.markdown("<div class="card">", unsafe_allow_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("##### ⚠️ Faktor Pendorong Risiko (+SHAP)")
         for item in memo_json.get('key_risk_drivers', []):
             st.markdown(f"- {item}")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_d2:
-        st.markdown("<div class="card">", unsafe_allow_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("##### 🛡️ Faktor Mitigasi / Pereda Risiko (-SHAP)")
         for item in memo_json.get('mitigating_factors', []):
             st.markdown(f"- {item}")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # Mitigation Plan / Conditions
     if 'conditions_or_mitigation_plan' in memo_json and memo_json['conditions_or_mitigation_plan']:
-        st.markdown("<div class="card">", unsafe_allow_html=True)
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("##### 📋 Rekomendasi Syarat Pencairan / Mitigasi")
         for cond in memo_json['conditions_or_mitigation_plan']:
             st.markdown(f"1. {cond}")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
 # ROW 3: RAW JSON & AUDIT TRAIL EXPORT
