@@ -499,6 +499,32 @@ def configure_page() -> None:
                 margin: 1.1rem 0;
                 border-color: #f1f5f9;
             }
+
+            /* ---------- Streamlit Expanders (Audit Trail & Sidebars) ---------- */
+            div[data-testid="stExpander"] {
+                border: 1.5px solid #bae6fd !important;
+                background-color: #ffffff !important;
+                border-radius: 12px !important;
+                box-shadow: 0 2px 6px rgba(14, 165, 233, 0.05) !important;
+                margin-top: 0.8rem !important;
+            }
+            div[data-testid="stExpander"] details summary,
+            div[data-testid="stExpander"] summary,
+            div[data-testid="stExpander"] summary *,
+            div[data-testid="stExpander"] summary p,
+            div[data-testid="stExpander"] summary span {
+                color: #0369a1 !important;
+                font-weight: 800 !important;
+                font-size: 0.95rem !important;
+            }
+            div[data-testid="stExpander"] summary:hover,
+            div[data-testid="stExpander"] summary:hover * {
+                color: #0284c7 !important;
+            }
+            div[data-testid="stExpander"] summary svg {
+                fill: #0369a1 !important;
+                stroke: #0369a1 !important;
+            }
         </style>
         """,
         unsafe_allow_html=True,
@@ -528,6 +554,35 @@ def render_header() -> None:
 # SIDEBAR: APPLICANT INPUT FORM & PRESETS (WITH SOLID BLACK LABELS)
 # ==============================================================================
 def render_sidebar() -> tuple[ApplicantInput, str, str]:
+    # --------------------------------------------------------------------------
+    # 1. AI ENGINE / MODEL CONFIGURATION (AT THE VERY TOP)
+    # --------------------------------------------------------------------------
+    st.sidebar.markdown("### 🤖 Konfigurasi Model AI (LLM)")
+    ollama_endpoint = "http://localhost:11434"
+
+    # Deteksi dinamis mesin yang benar-benar aktif di sistem (Ollama, PyTorch, XAI)
+    available_engines = discover_available_engines(ollama_endpoint)
+    engine_keys = list(available_engines.keys())
+
+    def format_engine_label(key: str) -> str:
+        info = available_engines.get(key, {})
+        return f"{info.get('label', key)} • {info.get('badge', '')}"
+
+    llm_backend = st.sidebar.selectbox(
+        "Pilih Engine Memo AI:",
+        engine_keys,
+        index=0,
+        format_func=format_engine_label,
+        help="Dideteksi otomatis: Ollama lokal (xai-credit-agent:latest), bobot PyTorch GPU di models/, atau Fast SHAP XAI Engine.",
+    )
+    selected_engine_info = available_engines.get(llm_backend, {})
+    st.sidebar.caption(f"ℹ️ {selected_engine_info.get('detail', '')}")
+
+    st.sidebar.markdown("<hr style='margin: 0.8rem 0; border-color: #cbd5e1;'/>", unsafe_allow_html=True)
+
+    # --------------------------------------------------------------------------
+    # 2. PRESET SELECTION & APPLICANT FORM
+    # --------------------------------------------------------------------------
     st.sidebar.markdown("### 📋 Profil Pemohon Pinjaman")
 
     preset_option = st.sidebar.selectbox("💡 Pilih Contoh Profil Preset:", list(PRESETS.keys()))
@@ -580,27 +635,6 @@ def render_sidebar() -> tuple[ApplicantInput, str, str]:
             )
 
         st.form_submit_button("⚡ Hitung & Evaluasi Risiko", use_container_width=True)
-
-    with st.sidebar.expander("⚙️ Pengaturan Mesin AI (LLM)", expanded=False):
-        ollama_endpoint = st.text_input("Ollama Endpoint URL:", value="http://localhost:11434")
-
-        # Deteksi dinamis mesin yang benar-benar aktif di sistem (Ollama, PyTorch, XAI)
-        available_engines = discover_available_engines(ollama_endpoint)
-        engine_keys = list(available_engines.keys())
-
-        def format_engine_label(key: str) -> str:
-            info = available_engines.get(key, {})
-            return f"{info.get('label', key)} • {info.get('badge', '')}"
-
-        llm_backend = st.selectbox(
-            "Pilih Engine Memo AI:",
-            engine_keys,
-            index=0,
-            format_func=format_engine_label,
-            help="Dideteksi secara dinamis: model yang aktif di Ollama (port 11434), bobot PyTorch di models/, dan Fast XAI.",
-        )
-        selected_engine_info = available_engines.get(llm_backend, {})
-        st.caption(f"ℹ️ {selected_engine_info.get('detail', '')}")
 
     applicant = ApplicantInput(
         age=age, income=income, emp_len=emp_len, home_ownership=home_ownership,
@@ -709,7 +743,7 @@ def render_kpi_row(applicant: ApplicantInput, ml_result: dict) -> None:
         )
 
     with col4:
-        st.plotly_chart(_build_gauge_chart(pd_val, ml_result["risk_color"]), use_container_width=True)
+        st.plotly_chart(_build_gauge_chart(pd_val, ml_result["risk_color"]), use_container_width=True, theme=None)
 
 
 def _build_gauge_chart(pd_val: float, risk_color: str) -> go.Figure:
@@ -718,14 +752,14 @@ def _build_gauge_chart(pd_val: float, risk_color: str) -> go.Figure:
             mode="gauge+number",
             value=pd_val * 100,
             domain={"x": [0, 1], "y": [0, 1]},
-            number={"suffix": "%", "font": {"size": 22, "color": "#0f172a", "family": "Plus Jakarta Sans"}},
-            title={"text": "Indikator Meter Risiko", "font": {"size": 12, "color": "#64748b"}},
+            number={"suffix": "%", "font": {"size": 22, "color": "#0f172a", "family": "Plus Jakarta Sans", "weight": "bold"}},
+            title={"text": "Indikator Meter Risiko", "font": {"size": 12, "color": "#0f172a", "family": "Plus Jakarta Sans", "weight": "bold"}},
             gauge={
-                "axis": {"range": [0, 100], "tickwidth": 1, "tickcolor": "#94a3b8", "tickfont": {"size": 10}},
+                "axis": {"range": [0, 100], "tickwidth": 1, "tickcolor": "#64748b", "tickfont": {"size": 10, "color": "#0f172a"}},
                 "bar": {"color": risk_color, "thickness": 0.28},
-                "bgcolor": "#f8fafc",
+                "bgcolor": "#ffffff",
                 "borderwidth": 1,
-                "bordercolor": "#e2e8f0",
+                "bordercolor": "#cbd5e1",
                 "steps": [
                     {"range": [0, 20], "color": "rgba(16, 185, 129, 0.25)"},
                     {"range": [20, 40], "color": "rgba(245, 158, 11, 0.25)"},
@@ -740,10 +774,11 @@ def _build_gauge_chart(pd_val: float, risk_color: str) -> go.Figure:
         )
     )
     fig.update_layout(
+        template="plotly_white",
         margin=dict(l=10, r=10, t=35, b=10),
         height=150,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
     )
     return fig
 
@@ -769,9 +804,9 @@ def _build_radar_profile_chart(applicant: ApplicantInput) -> go.Figure:
     categories = [
         "Kapasitas Gaji",
         "Stabilitas Kerja",
-        "Rekam Jejak Kredit",
-        "Kapasitas Arus Kas",
-        "Kualitas Grade Pinjaman",
+        "Riwayat Kredit",
+        "Arus Kas Bebas",
+        "Grade Pinjaman",
     ]
     values = [income_score, emp_score, cred_score, lti_capacity, grade_score]
     # Tutup poligon radar
@@ -790,15 +825,26 @@ def _build_radar_profile_chart(applicant: ApplicantInput) -> go.Figure:
         )
     )
     fig.update_layout(
+        template="plotly_white",
         polar=dict(
-            radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9, color="#64748b")),
-            angularaxis=dict(tickfont=dict(size=10, family="Plus Jakarta Sans", color="#1e293b", weight="bold")),
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                tickfont=dict(size=9, color="#475569", family="Plus Jakarta Sans"),
+                gridcolor="#e2e8f0"
+            ),
+            angularaxis=dict(
+                tickfont=dict(size=11, family="Plus Jakarta Sans", color="#0f172a", weight="bold"),
+                gridcolor="#cbd5e1"
+            ),
+            bgcolor="#ffffff"
         ),
         showlegend=False,
-        margin=dict(l=35, r=35, t=30, b=25),
-        height=260,
-        paper_bgcolor="rgba(0,0,0,0)",
-        title=dict(text="🎯 5 Pilar Kesehatan Profil Kredit", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans")),
+        margin=dict(l=65, r=65, t=35, b=30),
+        height=270,
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        title=dict(text="🎯 5 Pilar Kesehatan Profil Kredit", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans", weight="bold")),
     )
     return fig
 
@@ -822,23 +868,33 @@ def _build_financial_donut_chart(applicant: ApplicantInput) -> go.Figure:
                 marker=dict(colors=colors, line=dict(color="#ffffff", width=2)),
                 textinfo="percent",
                 hoverinfo="label+value+percent",
-                textfont=dict(size=11, family="Plus Jakarta Sans"),
+                insidetextfont=dict(size=11, family="Plus Jakarta Sans", color="#ffffff", weight="bold"),
+                outsidetextfont=dict(size=11, family="Plus Jakarta Sans", color="#0f172a", weight="bold"),
             )
         ]
     )
     fig.update_layout(
+        template="plotly_white",
         showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5, font=dict(size=10)),
-        margin=dict(l=15, r=15, t=30, b=35),
-        height=260,
-        paper_bgcolor="rgba(0,0,0,0)",
-        title=dict(text="💰 Struktur Finansial & Arus Kas", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans")),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.28,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=11, family="Plus Jakarta Sans", color="#0f172a", weight="bold")
+        ),
+        margin=dict(l=15, r=15, t=30, b=45),
+        height=270,
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff",
+        title=dict(text="💰 Struktur Finansial & Arus Kas", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans", weight="bold")),
         annotations=[
             dict(
-                text=f"${applicant.income:,.0f}<br><span style='font-size:10px; color:#64748b;'>Total Gaji</span>",
+                text=f"<b>${applicant.income:,.0f}</b><br><span style='font-size:10px; color:#475569;'>Total Gaji</span>",
                 x=0.5,
                 y=0.5,
-                font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans", weight="bold"),
+                font=dict(size=13, color="#0f172a", family="Plus Jakarta Sans"),
                 showarrow=False,
             )
         ],
@@ -864,6 +920,7 @@ def _build_grade_benchmark_chart(applicant: ApplicantInput) -> go.Figure:
             marker=dict(color=bar_colors, line=dict(color="#0284c7", width=1.5)),
             text=[f"{r:.1f}%" for r in market_rates],
             textposition="auto",
+            textfont=dict(family="Plus Jakarta Sans", size=11, color="#0f172a", weight="bold"),
             name="Rata-rata Pasar",
             hoverinfo="x+y",
         )
@@ -877,18 +934,28 @@ def _build_grade_benchmark_chart(applicant: ApplicantInput) -> go.Figure:
         line_width=2,
         annotation_text=f"Bunga Pengajuan: {applicant.rate:.2f}%",
         annotation_position="top right",
-        annotation_font=dict(size=10, color="#dc2626"),
+        annotation_font=dict(size=10, color="#dc2626", family="Plus Jakarta Sans", weight="bold"),
     )
 
     fig.update_layout(
-        margin=dict(l=15, r=15, t=30, b=15),
-        height=260,
+        template="plotly_white",
+        margin=dict(l=25, r=15, t=30, b=20),
+        height=270,
         plot_bgcolor="#ffffff",
-        paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Plus Jakarta Sans", size=11, color="#334155"),
-        xaxis=dict(title="Loan Grade", gridcolor="#f1f5f9"),
-        yaxis=dict(title="Suku Bunga (%)", gridcolor="#f1f5f9", range=[0, max(max(market_rates), applicant.rate) + 3]),
-        title=dict(text=f"🏷️ Suku Bunga vs Benchmark Pasar (Grade {applicant.grade})", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans")),
+        paper_bgcolor="#ffffff",
+        font=dict(family="Plus Jakarta Sans", size=11, color="#0f172a"),
+        xaxis=dict(
+            title=dict(text="Loan Grade", font=dict(color="#0f172a", size=11, weight="bold")),
+            gridcolor="#e2e8f0",
+            tickfont=dict(color="#0f172a", size=11, weight="bold")
+        ),
+        yaxis=dict(
+            title=dict(text="Suku Bunga (%)", font=dict(color="#0f172a", size=11, weight="bold")),
+            gridcolor="#e2e8f0",
+            tickfont=dict(color="#0f172a", size=11, weight="bold"),
+            range=[0, max(max(market_rates), applicant.rate) + 3]
+        ),
+        title=dict(text=f"🏷️ Suku Bunga vs Benchmark Pasar (Grade {applicant.grade})", font=dict(size=12, color="#0f172a", family="Plus Jakarta Sans", weight="bold")),
     )
     return fig
 
@@ -900,11 +967,11 @@ def render_profile_visualizations(applicant: ApplicantInput) -> None:
     )
     c1, c2, c3 = st.columns([1.1, 1.1, 1.2])
     with c1:
-        st.plotly_chart(_build_radar_profile_chart(applicant), use_container_width=True)
+        st.plotly_chart(_build_radar_profile_chart(applicant), use_container_width=True, theme=None)
     with c2:
-        st.plotly_chart(_build_financial_donut_chart(applicant), use_container_width=True)
+        st.plotly_chart(_build_financial_donut_chart(applicant), use_container_width=True, theme=None)
     with c3:
-        st.plotly_chart(_build_grade_benchmark_chart(applicant), use_container_width=True)
+        st.plotly_chart(_build_grade_benchmark_chart(applicant), use_container_width=True, theme=None)
 
 
 # ==============================================================================
@@ -916,7 +983,7 @@ def render_shap_panel(ml_result: dict) -> None:
         unsafe_allow_html=True,
     )
     st.markdown(
-        "<p style='font-size:0.86rem; color:#64748b; margin-top:-0.4rem;'>"
+        "<p style='font-size:0.86rem; color:#475569; margin-top:-0.4rem;'>"
         "Analisis kontribusi variabel terhadap peningkatan (<span style='color:#ef4444; font-weight:700;'>+ Risiko</span>) "
         "atau peredam (<span style='color:#10b981; font-weight:700;'>- Proteksi</span>) kemungkinan gagal bayar:"
         "</p>",
@@ -942,20 +1009,38 @@ def render_shap_panel(ml_result: dict) -> None:
             "Pendorong Risiko (+SHAP)": "#ef4444",
             "Pereda Risiko (-SHAP)": "#10b981",
         },
-        labels={"shap_value": "Besaran Pengaruh SHAP", "feature_label": "Variabel Pemohon"},
+        labels={"shap_value": "Besaran Pengaruh SHAP", "feature_label": ""},
         title="Top 8 Variabel Paling Berpengaruh (TreeExplainer)",
     )
     fig.update_layout(
-        margin=dict(l=20, r=20, t=35, b=15),
-        height=360,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=""),
+        template="plotly_white",
+        margin=dict(l=10, r=20, t=35, b=15),
+        height=380,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            title="",
+            font=dict(family="Plus Jakarta Sans", size=11, color="#0f172a", weight="bold")
+        ),
         plot_bgcolor="#ffffff",
-        paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Plus Jakarta Sans", size=12, color="#334155"),
-        xaxis=dict(gridcolor="#f1f5f9", zerolinecolor="#cbd5e1", zerolinewidth=1.5),
-        yaxis=dict(gridcolor="#f1f5f9"),
+        paper_bgcolor="#ffffff",
+        font=dict(family="Plus Jakarta Sans", size=12, color="#0f172a"),
+        xaxis=dict(
+            title=dict(text="Besaran Pengaruh SHAP", font=dict(color="#0f172a", size=11, weight="bold")),
+            gridcolor="#e2e8f0",
+            zerolinecolor="#64748b",
+            zerolinewidth=2,
+            tickfont=dict(color="#0f172a", size=11, weight="bold")
+        ),
+        yaxis=dict(
+            gridcolor="#f8fafc",
+            tickfont=dict(color="#0f172a", size=11, weight="bold")
+        ),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, theme=None)
 
 
 def render_memo_panel(raw_input: dict, ml_result: dict, llm_backend: str, ollama_endpoint: str) -> dict:
