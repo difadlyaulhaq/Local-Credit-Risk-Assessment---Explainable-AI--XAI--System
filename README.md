@@ -93,6 +93,7 @@
 ```
 xai-credit-agent/
 │
+├── Modelfile                        # Blueprint model Ollama xai-credit-agent
 ├── PRD.md                           # Product Requirements Document & Tech Specs
 ├── README.md                        # Dokumentasi utama proyek
 ├── requirements.txt                 # Daftar dependensi Python resmi
@@ -179,11 +180,62 @@ model = PeftModel.from_pretrained(base_model, adapter_dir)
 print("Model XAI Credit Agent siap digunakan untuk inferensi!")
 ```
 
-### 4. Menjalankan Dashboard Streamlit
+### 4. Persiapan Model Ollama Lokal (Zero-Cost & Private)
+
+Sistem ini mendukung inferensi lokal 100% tanpa internet menggunakan **Ollama**:
+```bash
+# 1. Pastikan Ollama service sudah berjalan di komputer Anda
+# 2. Unduh model dasar Qwen 2.5 (3B GGUF ~1.9 GB)
+ollama pull qwen2.5:3b
+
+# 3. Buat model custom underwriter perbankan berbasis Modelfile proyek
+ollama create xai-credit-agent -f Modelfile
+```
+
+### 5. Menjalankan Dashboard Streamlit
 
 ```bash
 streamlit run app/app.py
 ```
+Aplikasi akan terbuka otomatis di peramban: `http://localhost:8501`.
+
+---
+
+## 💻 Panduan Penggunaan Sistem Secara Lokal (Local AI Step-by-Step Guide)
+
+Alur kerja penggunaan sistem analisis risiko kredit di antarmuka web:
+
+```
+[1. Pilih Engine AI] ───> [2. Pilih Preset / Input Data] ───> [3. Klik 'Hitung & Evaluasi']
+                                                                          │
+       ┌──────────────────────────────────────────────────────────────────┘
+       v
+[4. Evaluasi 4 Level Analisis]:
+   ├── Level 1: Hero Card Keputusan (APPROVE/REVIEW/REJECT) & Meteran PD
+   ├── Level 2: Visualisasi 5 Pilar Kredit (Radar), Alokasi Finansial (Donut) & Benchmark Bunga
+   ├── Level 3: Explainable AI SHAP Attribution (+Pendorong Risiko vs -Pereda Risiko)
+   └── Level 4: Automated Credit Underwriting Memo oleh Ollama AI (Executive Summary & Syarat)
+       │
+       v
+[5. Unduh Audit Trail JSON (Compliance & Bank Audit Ready)]
+```
+
+### Langkah demi Langkah:
+1. **Pilih Engine AI (Di Bagian Paling Atas Sidebar):**
+   * **`⚡ Otomatis (Rekomendasi Cerdas)`** *(Default)*: Sistem otomatis mendeteksi model lokal `xai-credit-agent:latest` di Ollama Anda.
+   * **`🦙 Ollama: xai-credit-agent:latest`**: Model underwriter khusus berparameter perbankan (`temperature: 0.2`).
+   * **`⚡ Fast SHAP-Grounded Engine`**: Mode instan (<10 milidetik) jika ingin melihat hasil matematis SHAP & XGBoost secara langsung tanpa menunggu generasi teks LLM.
+2. **Pilih Preset atau Input Data Pemohon:**
+   * Gunakan *Contoh Profil Preset* (Low Risk, Medium Risk, High Risk) untuk pengujian cepat.
+   * Atau isi formulir data demografi, penghasilan, masa kerja, plafon pinjaman, dan riwayat kredit nasabah.
+3. **Mengevaluasi Risiko:**
+   * Klik tombol **`⚡ Hitung & Evaluasi Risiko`**.
+4. **Membaca Hasil Analisis & Memo Underwriter:**
+   * **Metrik Keputusan**: Perhatikan rekomendasi persetujuan dan persentase *Probability of Default (PD)*.
+   * **Explainable AI (SHAP)**: Periksa bar chart untuk melihat transparansi variabel mana yang menaikkan risiko (+Merah) dan meredam risiko (-Hijau).
+   * **AI Credit Memo**: Baca *Executive Summary*, *Faktor Risiko*, *Mitigasi*, dan *Syarat Pencairan*. Anda dapat mengklik **`🔄 Generate Ulang`** untuk memperbarui narasi memo.
+5. **Ekspor Laporan untuk Kebutuhan Audit:**
+   * Buka panel **`🛠️ Audit Trail & Raw Data JSON`** di bagian bawah, lalu klik **`📥 Unduh Hasil Memo Lengkap (JSON)`** untuk arsip komite kredit.
 
 ---
 
